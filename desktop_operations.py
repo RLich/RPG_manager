@@ -4,12 +4,6 @@ import os
 work_dir = os.getcwd()
 file_possible_sessions_json = work_dir + "\\possible_sessions.json"
 file_dates_without_declarations = work_dir + "\\dates_without_declarations.json"
-sample = [
-
-    {
-        "abecadlo": 1
-    }
-]
 
 
 def update_json_file(json_file, content):
@@ -22,6 +16,3 @@ def update_json_file(json_file, content):
         file_content = dumps(dict_list, indent=4)
         file.write(file_content)
         print("File updated:", json_file)
-
-
-update_json_file(json_file=file_possible_sessions_json, content=sample)
