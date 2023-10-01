@@ -14,9 +14,6 @@ today = date.today()
 today_formatted = today.strftime("%d.%m.%Y")
 print("Today is:", today_formatted)
 
-# print(worksheet.acell("A9").value)
-# print(worksheet.get("A2:E2"))
-
 table = worksheet.get_all_records()
 
 
