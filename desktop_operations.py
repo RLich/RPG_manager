@@ -16,3 +16,13 @@ def update_json_file(json_file, content):
         file_content = dumps(dict_list, indent=4)
         file.write(file_content)
         print("File updated:", json_file)
+
+
+def return_content_of_json_file(json_file):
+    print("Reading the content of", json_file)
+    try:
+        with open(json_file, "r") as file:
+            file_content = loads(file.read())
+            return file_content
+    except FileNotFoundError:
+        print("File was not found")

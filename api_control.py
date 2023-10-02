@@ -4,6 +4,7 @@ from private_data import *
 import config
 from colorama import Fore, Style
 from desktop_operations import *
+from gui_operations import GUIHandler
 
 service_account = gspread.service_account()
 sheet = service_account.open("Terminy RPG")
@@ -36,14 +37,50 @@ def return_rows_given_days_from_today(days):
 def application():
     days = config.number_of_days_to_check
     rows_list = return_rows_given_days_from_today(days=days)
-    prepered_data = remove_redundant_columns_and_unify_responses(data=rows_list,
+    prepared_data = remove_redundant_columns_and_unify_responses(data=rows_list,
                                                                  fields_to_remove=["Termin?"])
-    possible_sessions = create_possible_session_candidates(dates_range=prepered_data)
-    print_result_of_checks(title="Session candidates:", content_list=possible_sessions)
+    possible_sessions = create_possible_session_candidates(dates_range=prepared_data)
     update_json_file(json_file=file_possible_sessions_json, content=possible_sessions)
-    missing_declarations = create_missing_declarations(dates_range=prepered_data)
-    print_result_of_checks(title="Missing declarations:", content_list=missing_declarations)
+    missing_declarations = create_missing_declarations(dates_range=prepared_data)
     update_json_file(json_file=file_dates_without_declarations, content=missing_declarations)
+    print_result_of_checks(title="Missing declarations:", content_list=missing_declarations)
+    print_result_of_checks(title="Session candidates:", content_list=possible_sessions)
+    prepare_and_deliver_notifications_missing_declarations(
+        declarations_file=return_content_of_json_file(
+            json_file=file_dates_without_declarations))
+
+
+def prepare_and_deliver_notifications_missing_declarations(declarations_file):
+    print("Preparing notifications")
+    for participant in participants:
+        dates_range_list = []
+        for item in declarations_file:
+            i = item[0].split(":")
+            recipient = i[0]
+            day = i[1]
+            if recipient == participant:
+                dates_range_list.append(day)
+        message_welcome = "Cześć %s, tutaj twój ulubiony bot - binarny avatar RPG. " \
+                          "Chciałbym przypomnieć o wpisaniu Twojej dostępności do arkusza. " \
+                          "Terminy, których nie uzupełniłeś:" % participant
+        message_dates = string_appender(strings_list=dates_range_list)
+        if len(dates_range_list) == 0:
+            pass
+        else:
+            send_notifications_via_messenger(facebook_usernames=[facebook_users_dict[participant]],
+                                             text_list=[message_welcome, message_dates])
+
+
+def string_appender(strings_list):
+    final_string = ""
+    counter = 0
+    for string in strings_list:
+        if counter == 0:
+            final_string = final_string + string
+        else:
+            final_string = final_string + "; " + string
+        counter += 1
+    return final_string
 
 
 def print_result_of_checks(title, content_list):
@@ -102,7 +139,7 @@ def return_missing_declarations(day):
         if len(day[participant]) == 0:
             print(Fore.RED + "%s did not declare their availability" % participant +
                   Style.RESET_ALL)
-            not_declared.append("%s - %s" % (participant, day["Termin"]))
+            not_declared.append("%s:%s" % (participant, day["Termin"]))
     return not_declared
 
 
@@ -118,6 +155,15 @@ def remove_redundant_columns_and_unify_responses(data, fields_to_remove):
             new_declaration = {'%s' % participant: '%s' % declaration.lower()}
             row.update(new_declaration)
     return data
+
+
+def send_notifications_via_messenger(text_list, facebook_usernames):
+    notificator = GUIHandler()
+    notificator.log_into_messenger()
+    for facebook_username in facebook_usernames:
+        notificator.select_user_via_sidebar(username=facebook_username)
+        notificator.send_messages(messages_list=text_list)
+        notificator.quit()
 
 
 application()
