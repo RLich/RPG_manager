@@ -6,7 +6,9 @@ Features:
 - Generating a list of possible game sessions for further acceptance;
 - Generating a list of people who did not declare their availability for a given day;
 - Storing results on a separate .json files in a human-readable manner.
-- Automatic sending of notifications via Messenger (currently using GUI, maybe I'll find some API)
+- Automatic sending of notifications via Messenger (currently using GUI, maybe I'll find some API):
+   * About missing declarations to be filled
+   * About incoming session
 
 Plans:
 - Setting up some sort of CRON job to run this program via a schedule;
