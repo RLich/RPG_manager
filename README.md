@@ -5,7 +5,7 @@ Features:
 - Pulling data from the Google Spreadsheet that we use to mark our availability for a given day;
 - Generating a list of possible game sessions for further acceptance;
 - Generating a list of people who did not declare their availability for a given day;
-- Storing results on a seperate .json files in a human-readable manner.
+- Storing results on a separate .json files in a human-readable manner.
 - Automatic sending of notifications via Messenger (currently using GUI, maybe I'll find some API)
 
 Plans:
