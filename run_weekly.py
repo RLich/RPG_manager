@@ -1,4 +1,4 @@
-from code.api_control import *
+from code.api_operations import *
 from config import config
 from code.desktop_operations import *
 
