@@ -2,14 +2,15 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from private_data import *
+from config.private_data import *
 import time
 
 
 class GUIHandler:
     def __init__(self):
+        print("__WebDriver is starting__")
         self.driver = webdriver.Chrome()
-        self.wait = WebDriverWait(self.driver, 10)
+        self.wait = WebDriverWait(self.driver, 5)
 
     def log_into_messenger(self):
         driver = self.driver
@@ -31,11 +32,13 @@ class GUIHandler:
 
     def select_user_via_sidebar(self, username):
         driver = self.driver
+        print("Selecting %s on Messenger" % username)
         if self.is_username_already_selected_bool(username=username) is True:
             pass
         else:
-            username_on_sidebar_xpath = "//img[@alt='%s']" % username
-            driver.find_element(By.XPATH, username_on_sidebar_xpath).click()
+            user_image_on_sidebar = "//img[@alt='%s']" % username
+            javascript_click = driver.find_element(By.XPATH, user_image_on_sidebar)
+            driver.execute_script("arguments[0].click();", javascript_click)
 
     def send_messages(self, messages_list):
         driver = self.driver
@@ -50,10 +53,15 @@ class GUIHandler:
         driver = self.driver
         wait = self.wait
         xpath = "//a[@aria-label='%s']" % username
-        wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
-        if driver.find_element(By.XPATH, xpath).text == username:
-            return True
+        try:
+            wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
+            if driver.find_element(By.XPATH, xpath).text == username:
+                print("User already selected on Messenger")
+                return True
+        except BaseException:
+            return False
 
     def quit(self):
+        print("__Closing WebDriver__")
         driver = self.driver
         driver.quit()

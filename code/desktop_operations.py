@@ -2,8 +2,9 @@ from json import loads, dumps
 import os
 
 work_dir = os.getcwd()
-file_possible_sessions_json = work_dir + "\\possible_sessions.json"
-file_dates_without_declarations = work_dir + "\\dates_without_declarations.json"
+file_possible_sessions_json = work_dir + "\\json_files\\possible_sessions.json"
+file_dates_without_declarations = work_dir + "\\json_files\\dates_without_declarations.json"
+file_next_session = work_dir + "\\json_files\\next_session.json"
 
 
 def update_json_file(json_file, content):
