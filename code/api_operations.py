@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from config.private_data import *
-from config import config
 from colorama import Fore, Style
 from code.desktop_operations import *
 from code.gui_operations import GUIHandler
@@ -58,10 +57,10 @@ def prepare_and_deliver_notifications_missing_declarations(declarations_file):
 def prepare_and_deliver_notifications_session_is_coming():
     next_session_content = return_content_of_json_file(json_file=file_next_session)
     next_session = next_session_content[0]["Termin"]
-    date_format = "%Y.%m.%d %H:%M"
+    date_format = "%d.%m.%Y %H:%M"
     date_next_session = datetime.strptime(next_session, date_format)
     print("Preparing notifications about incoming session")
-    if date_next_session + timedelta(days=1) >= today:
+    if date_next_session + timedelta(days=1) == today + timedelta(days=1):
         notifications_dict = {}
         for participant in participants:
             messages_list = [
@@ -71,6 +70,8 @@ def prepare_and_deliver_notifications_session_is_coming():
             receiver = {"%s" % facebook_users_dict[participant]: messages_list}
             notifications_dict.update(receiver)
         send_notifications_via_messenger(notifications_dict=notifications_dict)
+    else:
+        print("Next session is too far into the future to notify about it at the moment")
 
 
 def string_appender(strings_list):
