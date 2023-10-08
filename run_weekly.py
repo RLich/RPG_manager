@@ -1,11 +1,12 @@
-from code.api_operations import *
+from code.application import *
 from config import config
 from code.desktop_operations import *
 
 
 def run_weekly():
+    table_declarations = main_worksheet.get_all_records()
     days = config.number_of_days_to_check
-    rows_list = return_rows_given_days_from_today(days=days)
+    rows_list = return_rows_given_days_from_today(days=days, table=table_declarations)
     prepared_data = remove_redundant_columns_and_unify_responses(data=rows_list,
                                                                  fields_to_remove=["Termin?"])
     possible_sessions = create_possible_session_candidates(dates_range=prepared_data)

@@ -9,10 +9,8 @@ today = datetime.today()
 today_formatted = today.strftime("%d.%m.%Y")
 print("Application started:", today_formatted)
 
-table = worksheet.get_all_records()
 
-
-def return_rows_given_days_from_today(days):
+def return_rows_given_days_from_today(days, table):
     temp_list = []
     day_counter = 0
     row_counter = 0

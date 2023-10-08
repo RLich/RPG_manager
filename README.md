@@ -11,7 +11,6 @@ Features:
    * About incoming session
 
 Plans:
-- Setting up some sort of CRON job to run this program via a schedule;
 - Collecting responses and creating a confirmed sessions list;
 - Creating a Google Calendar (or similar) events for confirmed sessions;
 - maybe more...
