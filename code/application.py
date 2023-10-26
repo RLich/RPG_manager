@@ -33,13 +33,12 @@ def prepare_and_deliver_notifications_missing_declarations(declarations_file):
     else:
         notifications_dict = {}
         for participant in participants:
+            print("Zaczynam nowy participant, declaration file:", participant, declarations_file)
             dates_range_list = []
             for item in declarations_file:
-                i = item[0].split(":")
-                recipient = i[0]
-                day = i[1]
-                if recipient == participant:
-                    dates_range_list.append(day)
+                date, persons = return_date_and_persons_from_record(record=item)
+                if participant in persons:
+                    dates_range_list.append(date)
             messages_list = [
                 messages_dict["message_welcome_declarations"] % participant,
                 string_appender(strings_list=dates_range_list)
@@ -49,7 +48,18 @@ def prepare_and_deliver_notifications_missing_declarations(declarations_file):
             else:
                 receiver = {"%s" % facebook_users_dict[participant]: messages_list}
                 notifications_dict.update(receiver)
+        print(notifications_dict)
         send_notifications_via_messenger(notifications_dict=notifications_dict)
+
+
+def return_date_and_persons_from_record(record):
+    persons = []
+    date = record[0].split(":")[1]
+    for element in record:
+        person = element.split(":")
+        persons.append(person[0])
+    return date, persons
+
 
 
 def prepare_and_deliver_notifications_session_is_coming():
@@ -179,5 +189,5 @@ def send_notifications_via_messenger(notifications_dict):
             print("Sending notification to", facebook_user)
             notificator.select_user_via_sidebar(username=facebook_user)
             notificator.send_messages(messages_list=notifications_dict[facebook_user])
-            notificator.quit()
+        notificator.quit()
     print("All notifications sent")
