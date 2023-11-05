@@ -61,22 +61,25 @@ def return_date_and_persons_from_record(record):
     return date, persons
 
 
-
 def prepare_and_deliver_notifications_session_is_coming():
     next_session_content = return_content_of_json_file(json_file=file_next_session)
-    next_session = next_session_content[0]["Termin"]
-    date_format = "%d.%m.%Y %H:%M"
-    date_next_session = datetime.strptime(next_session, date_format)
+    next_session_day_month_year_hours_minutes = next_session_content[0]["Termin"]
+    next_session_day_month_year = next_session_day_month_year_hours_minutes.split(" ")[0]
+    date_format_day_month_year = "%d.%m.%Y"
+    date_next_session_day_month_year = datetime.strptime(
+        next_session_day_month_year, date_format_day_month_year)
     print("Preparing notifications about incoming session")
-    if date_next_session + timedelta(days=1) == today + timedelta(days=1):
+    if today + timedelta(days=1) < date_next_session_day_month_year + timedelta(days=1) \
+            < today + timedelta(days=2):
         notifications_dict = {}
         for participant in participants:
             messages_list = [
-                messages_dict["message_welcome_session_incoming"] % (participant,
-                                                                     next_session[slice(10, 16)])
+                messages_dict["message_welcome_session_incoming"] % (
+                    participant, next_session_day_month_year_hours_minutes)
             ]
             receiver = {"%s" % facebook_users_dict[participant]: messages_list}
             notifications_dict.update(receiver)
+        print(notifications_dict)
         send_notifications_via_messenger(notifications_dict=notifications_dict)
     else:
         print("Next session is too far into the future to notify about it at the moment")
