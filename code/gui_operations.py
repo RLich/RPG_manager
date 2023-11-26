@@ -19,9 +19,12 @@ class GUIHandler:
         driver.get(messenger_url)
 
         cookie_accept_xpath = "//button[@data-cookiebanner='accept_only_essential_button']"
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, cookie_accept_xpath)))
         driver.find_element(By.XPATH, cookie_accept_xpath).click()
 
-        login_email_field = driver.find_element(By.XPATH, "//input[@id='email']")
+        login_email_field_xpath = "//input[@id='email']"
+        self.wait.until(EC.element_to_be_clickable((By.XPATH, login_email_field_xpath)))
+        login_email_field = driver.find_element(By.XPATH, login_email_field_xpath)
         login_email_field.send_keys(bot_gmail_address)
 
         login_password_field = driver.find_element(By.XPATH, "//input[@id='pass']")
