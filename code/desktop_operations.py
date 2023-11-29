@@ -19,7 +19,7 @@ def update_json_file(json_file, content):
         dict_list = file_content
         file_content = dumps(dict_list, indent=4)
         file.write(file_content)
-        print("File updated:", json_file)
+        logging.debug("File updated:", json_file)
 
 
 def return_content_of_json_file(json_file):
@@ -29,7 +29,7 @@ def return_content_of_json_file(json_file):
             file_content = loads(file.read())
             return file_content
     except FileNotFoundError:
-        print("File was not found")
+        logging.error("File was not found")
 
 
 def update_log_file():
@@ -40,8 +40,5 @@ def update_log_file():
 def create_json_files_directory_if_needed():
     path = desktop + "\\json_files"
     is_exists = os.path.exists(path)
-    print(is_exists)
-    if is_exists is True:
-        pass
-    else:
+    if is_exists is False:
         os.mkdir(path)
