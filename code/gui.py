@@ -39,14 +39,30 @@ class GUIHandler:
         if self.is_username_already_selected_bool(username=username) is True:
             pass
         else:
-            user_image_on_sidebar = "//img[@alt='%s']" % username
-            javascript_click = driver.find_element(By.XPATH, user_image_on_sidebar)
-            driver.execute_script("arguments[0].click();", javascript_click)
+            users_xpath_base = "//div[@aria-label='Chats']/div/div/div/div/div/div"
+            users_xpath_end = "//a//span/span/span"
+            users_xpaths = [
+                users_xpath_base + users_xpath_end,
+                users_xpath_base + "[2]" + users_xpath_end,
+                users_xpath_base + "[3]" + users_xpath_end,
+                users_xpath_base + "[4]" + users_xpath_end
+            ]
+            users = []
+            for xpath in users_xpaths:
+                users.append(driver.find_element(By.XPATH, xpath))
+            for user in users:
+                if user.text == username:
+                    driver.execute_script("arguments[0].click();", user)
+                    break
+            print("User %s is now selected" % username)
+            time.sleep(1)
 
     def send_messages(self, messages_list):
         driver = self.driver
+        wait = self.wait
         for message in messages_list:
             textfield_xpath = "//div[@role='textbox']"
+            wait.until(EC.element_to_be_clickable((By.XPATH, textfield_xpath)))
             driver.find_element(By.XPATH, textfield_xpath).clear()
             driver.find_element(By.XPATH, textfield_xpath).send_keys(message)
             driver.find_element(By.XPATH, "//div[@aria-label='Press Enter to send']").click()
@@ -55,7 +71,7 @@ class GUIHandler:
     def is_username_already_selected_bool(self, username):
         driver = self.driver
         wait = self.wait
-        xpath = "//a[@aria-label='%s']" % username
+        xpath = "//div[@aria-label='Chats']/div/div/div/div/div/div//a//span/span/span"
         try:
             wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
             if driver.find_element(By.XPATH, xpath).text == username:

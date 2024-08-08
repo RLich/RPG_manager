@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from config.private_data import *
 from colorama import Fore, Style
-from code.desktop_operations import *
-from code.gui_operations import GUIHandler
+from code.desktop import *
+from code.gui import GUIHandler
 from miscellaneous.messages import *
 
 today = datetime.today()
@@ -33,7 +33,6 @@ def prepare_and_deliver_notifications_missing_declarations(declarations_file):
     else:
         notifications_dict = {}
         for participant in participants:
-            print("Zaczynam nowy participant, declaration file:", participant, declarations_file)
             dates_range_list = []
             for item in declarations_file:
                 date, persons = return_date_and_persons_from_record(record=item)
@@ -69,7 +68,7 @@ def prepare_and_deliver_notifications_session_is_coming():
     date_next_session_day_month_year = datetime.strptime(
         next_session_day_month_year, date_format_day_month_year)
     print("Preparing notifications about incoming session")
-    if today + timedelta(days=1) < date_next_session_day_month_year + timedelta(days=1) \
+    if today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
             < today + timedelta(days=2):
         notifications_dict = {}
         for participant in participants:
@@ -82,7 +81,8 @@ def prepare_and_deliver_notifications_session_is_coming():
         print(notifications_dict)
         send_notifications_via_messenger(notifications_dict=notifications_dict)
     else:
-        print("Next session is too far into the future to notify about it at the moment")
+        print(f"Next session ({next_session_day_month_year}) is too far into the future"
+              f" to notify about it at the moment")
 
 
 def string_appender(strings_list):
@@ -193,4 +193,4 @@ def send_notifications_via_messenger(notifications_dict):
             notificator.select_user_via_sidebar(username=facebook_user)
             notificator.send_messages(messages_list=notifications_dict[facebook_user])
         notificator.quit()
-    print("All notifications sent")
+    print("Finished process of sending notifications")
