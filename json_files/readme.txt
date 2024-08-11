@@ -1,0 +1,1 @@
+This directory is just to showcase the structure. The program expect this "json_files" directory in the desktop.
