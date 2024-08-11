@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from random import choice
 from config.private_data import *
 from colorama import Fore, Style
 from code.desktop import *
@@ -24,6 +25,35 @@ def return_rows_given_days_from_today(days, table):
                 day_counter += 1
             break
     return temp_list
+
+
+def move_of_a_day():
+    moves_file_content = return_content_of_json_file(file_moves)
+    available_moves = moves_file_content[0]
+    move = choice(list(available_moves.items()))
+    move_to_send = move[0] + "/n" + move[1]
+    print("Preparing tip of the day notification")
+    notifications_dict = {}
+    for participant in participants:
+        messages_list = [
+            messages_dict["message_tip_of_the_day"] % (participant, move_to_send)
+        ]
+        receiver = {"%s" % facebook_users_dict[participant]: messages_list}
+        notifications_dict.update(receiver)
+        print(notifications_dict)
+        send_notifications_via_messenger(notifications_dict=notifications_dict)
+        relocate_move_to_used_after_use(content=moves_file_content, move=move)
+
+    # except Exception:
+    #     print("No more moves to share left, please provide more to the .json file")
+
+
+def relocate_move_to_used_after_use(content, move):
+    print("Before:\n%s" % content)
+    content[0].pop(move[0])
+    content[1].update({move[0]: move[1]})
+    print("After:\n%s" % content[1])
+    update_json_file(json_file=file_moves, content=content)
 
 
 def prepare_and_deliver_notifications_missing_declarations(declarations_file):

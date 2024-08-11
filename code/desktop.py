@@ -7,6 +7,7 @@ file_possible_sessions_json = desktop + "\\json_files\\possible_sessions.json"
 file_dates_without_declarations = desktop + "\\json_files\\dates_without_declarations.json"
 file_next_session = desktop + "\\json_files\\next_session.json"
 file_logs = desktop + "\\logs\\RPG_manager.log"
+file_moves = desktop + "\\json_files\\moves.json"
 
 
 def update_json_file(json_file, content):
