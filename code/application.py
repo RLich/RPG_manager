@@ -68,33 +68,43 @@ def prepare_and_deliver_notifications_session_is_coming():
     date_next_session_day_month_year = datetime.strptime(
         next_session_day_month_year, date_format_day_month_year)
     print("Preparing notifications about incoming session")
+    from config.config import remind_about_session_in_days
     if today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
-            < today + timedelta(days=2):
-        send_notifications(message="message_welcome_session_incoming_tomorrow",
-                           date=next_session_day_month_year_hours_minutes)
+            < today + timedelta(days=remind_about_session_in_days[0] + 1):
+        send_notifications(message="message_welcome_session_incoming_0",
+                           date=next_session_day_month_year_hours_minutes,
+                           remind_in_how_many_days=remind_about_session_in_days[0])
     elif today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
-            < today + timedelta(days=4):
-        send_notifications(message="message_welcome_session_incoming_in_3_days",
-                           date=next_session_day_month_year_hours_minutes)
+            < today + timedelta(days=remind_about_session_in_days[1] + 1):
+        send_notifications(message="message_welcome_session_incoming_1",
+                           date=next_session_day_month_year_hours_minutes,
+                           remind_in_how_many_days=remind_about_session_in_days[1])
     elif today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
-            < today + timedelta(days=8):
-        send_notifications(message="message_welcome_session_incoming_in_7_days",
-                           date=next_session_day_month_year_hours_minutes)
+            < today + timedelta(days=remind_about_session_in_days[2] + 1):
+        send_notifications(message="message_welcome_session_incoming_2",
+                           date=next_session_day_month_year_hours_minutes,
+                           remind_in_how_many_days=remind_about_session_in_days[2])
     else:
         print(f"Next session ({next_session_day_month_year}) is too far into the future"
             f" to notify about it at the moment")
 
 
-def send_notifications(message, date):
+def send_notifications(message, date, remind_in_how_many_days):
     notifications_dict = {}
+    days_wording = format_days_wording_for_incoming_session_message(remind_in_how_many_days)
     for participant in participants:
-        messages_list = [messages_dict[message] % (participant, date)]
+        messages_list = [messages_dict[message] % (participant, days_wording, date)]
         receiver = {"%s" % facebook_users_dict[participant]: messages_list}
         notifications_dict.update(receiver)
     print(notifications_dict)
     send_notifications_via_messenger(notifications_dict=notifications_dict)
 
 
+def format_days_wording_for_incoming_session_message(days_to_session):
+    if days_to_session == 1:
+        return "jutro"
+    else:
+        return "za %s dni" % days_to_session
 
 
 
