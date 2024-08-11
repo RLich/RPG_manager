@@ -70,19 +70,32 @@ def prepare_and_deliver_notifications_session_is_coming():
     print("Preparing notifications about incoming session")
     if today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
             < today + timedelta(days=2):
-        notifications_dict = {}
-        for participant in participants:
-            messages_list = [
-                messages_dict["message_welcome_session_incoming"] % (
-                    participant, next_session_day_month_year_hours_minutes)
-            ]
-            receiver = {"%s" % facebook_users_dict[participant]: messages_list}
-            notifications_dict.update(receiver)
-        print(notifications_dict)
-        send_notifications_via_messenger(notifications_dict=notifications_dict)
+        send_notifications(message="message_welcome_session_incoming_tomorrow",
+                           date=next_session_day_month_year_hours_minutes)
+    elif today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
+            < today + timedelta(days=4):
+        send_notifications(message="message_welcome_session_incoming_in_3_days",
+                           date=next_session_day_month_year_hours_minutes)
+    elif today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
+            < today + timedelta(days=8):
+        send_notifications(message="message_welcome_session_incoming_in_7_days",
+                           date=next_session_day_month_year_hours_minutes)
     else:
         print(f"Next session ({next_session_day_month_year}) is too far into the future"
-              f" to notify about it at the moment")
+            f" to notify about it at the moment")
+
+
+def send_notifications(message, date):
+    notifications_dict = {}
+    for participant in participants:
+        messages_list = [messages_dict[message] % (participant, date)]
+        receiver = {"%s" % facebook_users_dict[participant]: messages_list}
+        notifications_dict.update(receiver)
+    print(notifications_dict)
+    send_notifications_via_messenger(notifications_dict=notifications_dict)
+
+
+
 
 
 def string_appender(strings_list):

@@ -1,6 +1,6 @@
 from code.application import *
 from config import config
-from code.desktop_operations import *
+from code.desktop import *
 
 
 def run_weekly():
