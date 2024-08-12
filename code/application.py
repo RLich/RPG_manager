@@ -30,22 +30,22 @@ def return_rows_given_days_from_today(days, table):
 def move_of_a_day():
     moves_file_content = return_content_of_json_file(file_moves)
     available_moves = moves_file_content[0]
-    move = choice(list(available_moves.items()))
-    move_to_send = move[0] + "/n" + move[1]
-    print("Preparing tip of the day notification")
-    notifications_dict = {}
-    for participant in participants:
-        messages_list = [
-            messages_dict["message_tip_of_the_day"] % (participant, move_to_send)
-        ]
-        receiver = {"%s" % facebook_users_dict[participant]: messages_list}
-        notifications_dict.update(receiver)
+    try:
+        move = choice(list(available_moves.items()))
+        move_to_send = move[0] + "/n" + move[1]
+        print("Preparing tip of the day notification")
+        notifications_dict = {}
+        for participant in participants:
+            messages_list = [
+                messages_dict["message_tip_of_the_day"] % (participant, move_to_send)
+            ]
+            receiver = {"%s" % facebook_users_dict[participant]: messages_list}
+            notifications_dict.update(receiver)
         print(notifications_dict)
         send_notifications_via_messenger(notifications_dict=notifications_dict)
         relocate_move_to_used_after_use(content=moves_file_content, move=move)
-
-    # except Exception:
-    #     print("No more moves to share left, please provide more to the .json file")
+    except Exception:
+        print("No more moves to share left, please provide more to the .json file")
 
 
 def relocate_move_to_used_after_use(content, move):
