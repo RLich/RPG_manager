@@ -26,7 +26,7 @@ def update_json_file(json_file, content):
 def return_content_of_json_file(json_file):
     print("Reading the content of", json_file)
     try:
-        with open(json_file, "r") as file:
+        with open(json_file, "r", encoding="utf-8") as file:
             file_content = loads(file.read())
             return file_content
     except FileNotFoundError:

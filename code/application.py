@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from time import sleep
 from random import choice
 from config.private_data import *
 from colorama import Fore, Style
@@ -32,12 +33,11 @@ def move_of_a_day():
     available_moves = moves_file_content[0]
     try:
         move = choice(list(available_moves.items()))
-        move_to_send = move[0] + "/n" + move[1]
         print("Preparing tip of the day notification")
         notifications_dict = {}
         for participant in participants:
             messages_list = [
-                messages_dict["message_tip_of_the_day"] % (participant, move_to_send)
+                messages_dict["message_tip_of_the_day"] % (participant, move[0], move[1])
             ]
             receiver = {"%s" % facebook_users_dict[participant]: messages_list}
             notifications_dict.update(receiver)
@@ -49,10 +49,8 @@ def move_of_a_day():
 
 
 def relocate_move_to_used_after_use(content, move):
-    print("Before:\n%s" % content)
     content[0].pop(move[0])
     content[1].update({move[0]: move[1]})
-    print("After:\n%s" % content[1])
     update_json_file(json_file=file_moves, content=content)
 
 
@@ -99,24 +97,23 @@ def prepare_and_deliver_notifications_session_is_coming():
         next_session_day_month_year, date_format_day_month_year)
     print("Preparing notifications about incoming session")
     from config.config import remind_about_session_in_days
-    if today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
-            < today + timedelta(days=remind_about_session_in_days[0] + 1):
+    today = datetime.today()
+    today = today.replace(hour=0, minute=0, second=0, microsecond=0)
+    if date_next_session_day_month_year - timedelta(days=remind_about_session_in_days[0]) == today:
         send_notifications(message="message_welcome_session_incoming_0",
                            date=next_session_day_month_year_hours_minutes,
                            remind_in_how_many_days=remind_about_session_in_days[0])
-    elif today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
-            < today + timedelta(days=remind_about_session_in_days[1] + 1):
+    elif date_next_session_day_month_year - timedelta(days=remind_about_session_in_days[1]) == today:
         send_notifications(message="message_welcome_session_incoming_1",
                            date=next_session_day_month_year_hours_minutes,
                            remind_in_how_many_days=remind_about_session_in_days[1])
-    elif today + timedelta(days=0) < date_next_session_day_month_year + timedelta(days=1) \
-            < today + timedelta(days=remind_about_session_in_days[2] + 1):
+    elif date_next_session_day_month_year - timedelta(days=remind_about_session_in_days[2]) == today:
         send_notifications(message="message_welcome_session_incoming_2",
                            date=next_session_day_month_year_hours_minutes,
                            remind_in_how_many_days=remind_about_session_in_days[2])
     else:
-        print(f"Next session ({next_session_day_month_year}) is too far into the future"
-            f" to notify about it at the moment")
+        print(f"Next session ({next_session_day_month_year}) does not quality to be for any of the remiders "
+              f"({remind_about_session_in_days} days before) for notification")
 
 
 def send_notifications(message, date, remind_in_how_many_days):
@@ -245,5 +242,6 @@ def send_notifications_via_messenger(notifications_dict):
             print("Sending notification to", facebook_user)
             notificator.select_user_via_sidebar(username=facebook_user)
             notificator.send_messages(messages_list=notifications_dict[facebook_user])
+        sleep(3)
         notificator.quit()
     print("Finished process of sending notifications")
